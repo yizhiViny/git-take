@@ -33,8 +33,8 @@ class FreeplayState extends MusicBeatState
 	var curDifficulty:Int = -1;
 	private static var lastDifficultyName:String = '';
 
-	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
+	var songsText:FlxText;
 	var diffText:FlxText;
 	var lerpScore:Int = 0;
 	var lerpRating:Float = 0;
@@ -45,11 +45,13 @@ class FreeplayState extends MusicBeatState
 	private var curPlaying:Bool = false;
 
 	private var iconArray:Array<HealthIcon> = [];
+	private var songArray:FlxTypedGroup<FlxSprite>;
 
 	var bg:FlxSprite;
+	var fb:FlxSprite;
 	var intendedColor:Int;
 	var colorTween:FlxTween;
-
+	
 	override function create()
 	{
 		//Paths.clearStoredMemory();
@@ -109,8 +111,20 @@ class FreeplayState extends MusicBeatState
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 
+		songArray= new FlxTypedGroup<FlxSprite>();
+		add(songArray);
+		
+		var sname:String = '';
+
 		for (i in 0...songs.length)
 		{
+			sname = 'mainmenu/freeplay/songs/' + songs[i].songName;
+			if(!Paths.fileExists('images/' + sname + '.png', IMAGE)) sname = 'mainmenu/mainmenu/freeplay/songs/'+ songs[i].songName; //Older versions of psych engine's support
+			if(!Paths.fileExists('images/' + sname + '.png', IMAGE)) sname = 'mainmenu/freeplay/There-is-no-song-art';
+            var songA:FlxSprite = new FlxSprite(0,0).loadGraphic(Paths.image(sname));
+			songA.ID = i;
+			songArray.add(songA);
+
 			var songText:Alphabet = new Alphabet(90, 320, songs[i].songName, true);
 			songText.isMenuItem = true;
 			songText.targetY = i - curSelected;
@@ -122,27 +136,26 @@ class FreeplayState extends MusicBeatState
 				songText.scaleX = maxWidth / songText.width;
 			}
 			songText.snapToPosition();
-
-			Paths.currentModDirectory = songs[i].folder;
-			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
-			icon.sprTracker = songText;
-
-			// using a FlxGroup is too much fuss!
-			iconArray.push(icon);
-			add(icon);
-
+			
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 			// songText.screenCenter(X);
 		}
 		WeekData.setDirectoryFromWeek();
+		
+		fb = new FlxSprite(0);
+		fb.frames = Paths.getSparrowAtlas('mainmenu/freeplay/freeplay-bg3');
+		fb.animation.addByPrefix('idle',"move", 24);
+		fb.animation.play('idle');
+		fb.scrollFactor.set(0, 0);
+		add(fb);
+
+		songsText = new FlxText(0, 0, 0, "", 110);
+		songsText.setFormat(Paths.font("Determination.otf"), 110, FlxColor.WHITE, RIGHT);
+		add(songsText);
 
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
-		scoreText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
-
-		scoreBG = new FlxSprite(scoreText.x - 6, 0).makeGraphic(1, 66, 0xFF000000);
-		scoreBG.alpha = 0.6;
-		add(scoreBG);
+		scoreText.setFormat(Paths.font("Determination.otf"), 32, FlxColor.WHITE, RIGHT);
 
 		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
 		diffText.font = scoreText.font;
@@ -181,11 +194,17 @@ class FreeplayState extends MusicBeatState
 
 			trace(md);
 		 */
+        scoreText.text = 'Score: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		scoreText.x = 200 - scoreText.width / 2;
+		scoreText.y = 550 - scoreText.height / 2;
 
-		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
-		textBG.alpha = 0.6;
-		add(textBG);
+		diffText.x = 1043 - diffText.width / 2;
+		diffText.y = 550 - diffText.height / 2;
 
+		songsText.text = songs[curSelected].songName;
+		songsText.x = 643 - songsText.width / 2;
+		songsText.y = 640 - songsText.height / 2;
+		
 		final buttonSpace:String = mobile.MobileControls.enabled ? 'X' : 'SPACE';
 		final buttonCtrl:String = mobile.MobileControls.enabled ? 'C' : 'CTRL';
 		final buttonReset:String = mobile.MobileControls.enabled ? 'Y' : 'RESET';
@@ -197,10 +216,6 @@ class FreeplayState extends MusicBeatState
 		var leText:String = 'Press $buttonCtrl to open the Gameplay Changers Menu / Press $buttonReset to Reset your Score and Accuracy.';
 		var size:Int = 18;
 		#end
-		var text:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, leText, size);
-		text.setFormat(Paths.font("vcr.ttf"), size, FlxColor.WHITE, RIGHT);
-		text.scrollFactor.set();
-		add(text);
 
         addVirtualPad(LEFT_FULL, A_B_C_X_Y_Z);
 
@@ -467,24 +482,30 @@ class FreeplayState extends MusicBeatState
 
 		var bullShit:Int = 0;
 
-		for (i in 0...iconArray.length)
-		{
-			iconArray[i].alpha = 0.6;
-		}
+		for (tem in songArray.members)
+			{
+				tem.alpha = 0;
+				// item.setGraphicSize(Std.int(item.width * 0.8));
+	
+				if (tem.ID == curSelected)
+				{
+					tem.alpha = 1;
+					// item.setGraphicSize(Std.int(item.width));
+				}
+			}
 
-		iconArray[curSelected].alpha = 1;
 
 		for (item in grpSongs.members)
 		{
 			item.targetY = bullShit - curSelected;
 			bullShit++;
 
-			item.alpha = 0.6;
+			item.alpha = 0;
 			// item.setGraphicSize(Std.int(item.width * 0.8));
 
 			if (item.targetY == 0)
 			{
-				item.alpha = 1;
+				item.alpha = 0;
 				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
@@ -531,15 +552,6 @@ class FreeplayState extends MusicBeatState
 		{
 			curDifficulty = newPos;
 		}
-	}
-
-	private function positionHighscore() {
-		scoreText.x = FlxG.width - scoreText.width - 6;
-
-		scoreBG.scale.x = FlxG.width - scoreText.x + 6;
-		scoreBG.x = FlxG.width - (scoreBG.scale.x / 2);
-		diffText.x = Std.int(scoreBG.x + (scoreBG.width / 2));
-		diffText.x -= diffText.width / 2;
 	}
 }
 
