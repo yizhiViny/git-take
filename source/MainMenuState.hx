@@ -1,6 +1,6 @@
 package;
 
-#if DISCORD_ALLOWED
+#if desktop
 import Discord.DiscordClient;
 #end
 import flixel.FlxG;
@@ -46,16 +46,14 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
-		#if MODS_ALLOWED
 		Paths.pushGlobalMods();
-		#end
+		
 		WeekData.loadTheFirstEnabledMod();
 
-		#if DISCORD_ALLOWED
+		#if desktop
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
-		debugKeys = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1'));
 
 		camGame = new FlxCamera();
 		camAchievement = new FlxCamera();
@@ -69,7 +67,7 @@ class MainMenuState extends MusicBeatState
 		transOut = FlxTransitionableState.defaultTransOut;
 
 		persistentUpdate = persistentDraw = true;
-
+	
 		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('mainmenu/freeplay/freeplay-bg1'));
 		bg.scrollFactor.set(0, 0);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
@@ -77,7 +75,7 @@ class MainMenuState extends MusicBeatState
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
-		
+
 		var bg3:FlxSprite = new FlxSprite(-80);
 		bg3.frames = Paths.getSparrowAtlas('mainmenu/menu/bg3');
 		bg3.animation.addByPrefix('idle',"bg am", 24);
@@ -88,7 +86,14 @@ class MainMenuState extends MusicBeatState
 		bg3.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg3);
 
-        var bg2:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('mainmenu/menu/BG_2'));
+		var glitched:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('mainmenu/menu/Glitched'));
+		glitched.scrollFactor.set(0, 0);
+		glitched.updateHitbox();
+		glitched.screenCenter();
+		glitched.antialiasing = ClientPrefs.globalAntialiasing;
+		add(glitched);
+
+		var bg2:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('mainmenu/menu/BG_2'));
 		bg2.scrollFactor.set(0, 0);
 		bg2.updateHitbox();
 		bg2.screenCenter();
@@ -100,8 +105,9 @@ class MainMenuState extends MusicBeatState
 		add(camFollow);
 		add(camFollowPos);
 
+		
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
-		magenta.scrollFactor.set(0,0);
+		magenta.scrollFactor.set(0, 0);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
 		magenta.updateHitbox();
 		magenta.screenCenter();
@@ -119,7 +125,6 @@ class MainMenuState extends MusicBeatState
 		/*if(optionShit.length > 6) {
 			scale = 6 / optionShit.length;
 		}*/
-
 		for (i in 0...optionShit.length)
 		{
 			var offset:Float = 0 - (Math.max(optionShit.length, 0) - 0) * 0;
@@ -139,6 +144,7 @@ class MainMenuState extends MusicBeatState
 			menuItem.antialiasing = ClientPrefs.globalAntialiasing;
 			menuItem.setGraphicSize(Std.int(menuItem.width * 0.8));
 			menuItem.updateHitbox();
+			
 		}
 
 		FlxG.camera.follow(camFollowPos, null, 1);
@@ -169,8 +175,8 @@ class MainMenuState extends MusicBeatState
 		}
 		#end
 
-		addVirtualPad(UP_DOWN, A_B_E);
-
+        addVirtualPad(UP_DOWN, A_B_E);
+        
 		super.create();
 	}
 
@@ -270,18 +276,13 @@ class MainMenuState extends MusicBeatState
 					});
 				}
 			}
-			else if (virtualPad.buttonE.justPressed || FlxG.keys.anyJustPressed(debugKeys))
-			{
-				selectedSomethin = true;
-				MusicBeatState.switchState(new MasterEditorMenu());
-			}
+
 		}
 
 		super.update(elapsed);
 
 		menuItems.forEach(function(spr:FlxSprite)
 		{
-			spr.screenCenter(X);
 		});
 	}
 
@@ -306,7 +307,6 @@ class MainMenuState extends MusicBeatState
 				if(menuItems.length > 4) {
 					add = menuItems.length * 8;
 				}
-				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
 				spr.centerOffsets();
 			}
 		});
