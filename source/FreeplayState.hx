@@ -194,17 +194,6 @@ class FreeplayState extends MusicBeatState
 
 			trace(md);
 		 */
-        scoreText.text = 'Score: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
-		scoreText.x = 200 - scoreText.width / 2;
-		scoreText.y = 550 - scoreText.height / 2;
-
-		diffText.x = 1043 - diffText.width / 2;
-		diffText.y = 550 - diffText.height / 2;
-
-		songsText.text = songs[curSelected].songName;
-		songsText.x = 643 - songsText.width / 2;
-		songsText.y = 640 - songsText.height / 2;
-		
 		final buttonSpace:String = mobile.MobileControls.enabled ? 'X' : 'SPACE';
 		final buttonCtrl:String = mobile.MobileControls.enabled ? 'C' : 'CTRL';
 		final buttonReset:String = mobile.MobileControls.enabled ? 'Y' : 'RESET';
@@ -284,7 +273,17 @@ class FreeplayState extends MusicBeatState
 		}
 
 		scoreText.text = 'PERSONAL BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
-		positionHighscore();
+		
+		scoreText.text = 'Score: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		scoreText.x = 200 - scoreText.width / 2;
+		scoreText.y = 550 - scoreText.height / 2;
+
+		diffText.x = 1043 - diffText.width / 2;
+		diffText.y = 550 - diffText.height / 2;
+
+		songsText.text = songs[curSelected].songName;
+		songsText.x = 643 - songsText.width / 2;
+		songsText.y = 640 - songsText.height / 2;
 
 		var upP = controls.UI_UP_P;
 		var downP = controls.UI_DOWN_P;
@@ -446,7 +445,6 @@ class FreeplayState extends MusicBeatState
 
 		PlayState.storyDifficulty = curDifficulty;
 		diffText.text = '< ' + CoolUtil.difficultyString() + ' >';
-		positionHighscore();
 	}
 
 	function changeSelection(change:Int = 0, playSound:Bool = true)
