@@ -35,10 +35,7 @@ class MainMenuState extends MusicBeatState
 	var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
-		#if MODS_ALLOWED 'mods', #end
-		#if ACHIEVEMENTS_ALLOWED 'awards', #end
 		'credits',
-		#if !switch 'donate', #end
 		'options'
 	];
 
@@ -73,17 +70,33 @@ class MainMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
-		bg.scrollFactor.set(0, yScroll);
+		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('mainmenu/freeplay/freeplay-bg1'));
+		bg.scrollFactor.set(0, 0);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
+		
+		var bg3:FlxSprite = new FlxSprite(-80);
+		bg3.frames = Paths.getSparrowAtlas('mainmenu/menu/bg3');
+		bg3.animation.addByPrefix('idle',"bg am", 24);
+		bg3.animation.play('idle');
+		bg3.scrollFactor.set(0, 0);
+		bg3.updateHitbox();
+		bg3.screenCenter();
+		bg3.antialiasing = ClientPrefs.globalAntialiasing;
+		add(bg3);
 
-		camFollow = new FlxObject(0, 0, 1, 1);
-		camFollowPos = new FlxObject(0, 0, 1, 1);
+        var bg2:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('mainmenu/menu/BG_2'));
+		bg2.scrollFactor.set(0, 0);
+		bg2.updateHitbox();
+		bg2.screenCenter();
+		bg2.antialiasing = ClientPrefs.globalAntialiasing;
+		add(bg2);
+
+		camFollow = new FlxObject(0, 0, 0, 0);
+		camFollowPos = new FlxObject(0, 0, 0, 0);
 		add(camFollow);
 		add(camFollowPos);
 
@@ -109,8 +122,8 @@ class MainMenuState extends MusicBeatState
 
 		for (i in 0...optionShit.length)
 		{
-			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
-			var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
+			var offset:Float = 0 - (Math.max(optionShit.length, 0) - 0) * 0;
+			var menuItem:FlxSprite = new FlxSprite(100, (i * 120)  + offset + 240);
 			menuItem.scale.x = scale;
 			menuItem.scale.y = scale;
 			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
@@ -118,23 +131,23 @@ class MainMenuState extends MusicBeatState
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
 			menuItem.ID = i;
-			menuItem.screenCenter(X);
 			menuItems.add(menuItem);
-			var scr:Float = (optionShit.length - 4) * 0.135;
+			menuItem.x -= 75;
+			var scr:Float = (optionShit.length - 0) * 0;
 			if(optionShit.length < 6) scr = 0;
 			menuItem.scrollFactor.set(0, scr);
 			menuItem.antialiasing = ClientPrefs.globalAntialiasing;
-			//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
+			menuItem.setGraphicSize(Std.int(menuItem.width * 0.8));
 			menuItem.updateHitbox();
 		}
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, "Psych Engine v" + psychEngineVersion, 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, "Glitched Takeover v" + '1', 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Friday Night Funkin' v" + Application.current.meta.get('version'), 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "PsychEngine v" + '0.6.3"', 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
